@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect} from 'react';
+import React, {createContext, useContext, useEffect} from 'react';
 import {createSlice, configureStore, AnyAction} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {reducer as dynamicReducer} from '@simprl/dynamic-reducer';
@@ -38,10 +38,10 @@ const exStore = {
 const Context = createContext(exStore);
 
 const App = () => <Context.Provider value={exStore}>
-	<Panel space='flag1' />
-	<Panel space='flag2' />
-	<ButtonGhost space='flag1' />
-	<ButtonGhost space='flag2' />
+	<div className='App'>
+		<AppUi />
+	</div>
+	<AppGhost/>
 </Context.Provider>;
 
 type WithSpace = {
@@ -55,7 +55,7 @@ const Panel = ({space}: WithSpace) => {
 	const clickHandler = useSpaceAction(space, () => stateSlice.actions.set(!flag));
 
 	return (
-		<div className='App'>
+		<div>
 			<button onClick={clickHandler} >{flag ? 'disable' : 'enable'}</button>
 			<span>{flag ? 'enabled' : 'disabled'}</span>
 		</div>
@@ -67,9 +67,9 @@ const ButtonGhost = ({space}: WithSpace) => {
 	const {useStorePath, dispatch} = useContext(Context);
 	const flag = useStorePath([space]);
 	useEffect(() => {
-		if (flag) {
+		if (!flag) {
 			const id = setTimeout(() => {
-				dispatch({...stateSlice.actions.set(false), space});
+				dispatch({...stateSlice.actions.set(true), space});
 			}, 1000);
 			return () => {
 				clearTimeout(id);
@@ -77,6 +77,24 @@ const ButtonGhost = ({space}: WithSpace) => {
 		}
 	}, [flag, dispatch]);
 	return null;
+};
+
+const AppUi = () => {
+	const {useStorePath} = useContext(Context);
+	const flag1 = useStorePath(['flag1']);
+	return <>
+		<Panel space='flag1' />
+		{flag1 && <Panel space='flag2' />}
+	</>;
+};
+
+const AppGhost = () => {
+	const {useStorePath} = useContext(Context);
+	const flag1 = useStorePath(['flag1']);
+	return <>
+		<ButtonGhost space='flag1' />
+		{flag1 && <ButtonGhost space='flag2' />}
+	</>;
 };
 
 export default App;

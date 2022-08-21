@@ -1,26 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {createContext, useContext, useMemo, useState} from 'react';
 import './App.css';
 
-function App() {
+type ContextInterface = {
+	state: boolean;
+	setState: (state: boolean) => void;
+};
+
+const Context = createContext<ContextInterface>({
+	state: false,
+	setState: (state: boolean) => undefined,
+});
+
+const App = () => {
+	const [state, setState] = useState(false);
+	const contextValue = useMemo(() => ({state, setState}), [state]);
+	return <Context.Provider value={contextValue}>
+		<Panel />
+	</Context.Provider>;
+};
+
+const Panel = () => {
+	const {state, setState} = useContext(Context);
 	return (
 		<div className='App'>
-			<header className='App-header'>
-				<img src={logo} className='App-logo' alt='logo' />
-				<p>
-                    Edit <code>src/App.tsx</code> and save to reload.
-				</p>
-				<a
-					className='App-link'
-					href='https://reactjs.org'
-					target='_blank'
-					rel='noopener noreferrer'
-				>
-                    Learn React
-				</a>
-			</header>
+			<button onClick={() => {
+				setState(!state);
+			}} >{state ? 'disable' : 'enable'}</button>
+			<span>{state ? 'enabled' : 'disabled'}</span>
 		</div>
 	);
-}
+};
 
 export default App;

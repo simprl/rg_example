@@ -1,49 +1,57 @@
-import React, {createContext, useContext, useEffect, useMemo, useState} from 'react';
+import React, {createContext, useContext, useEffect} from 'react';
+import {createSlice, configureStore} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
+import {getUseStorePath} from 'use-store-path';
 import './App.css';
 
-type ContextInterface = {
-	state: boolean;
-	setState: (state: boolean) => void;
-};
-
-const Context = createContext<ContextInterface>({
-	state: false,
-	setState: (state: boolean) => undefined,
+export const stateSlice = createSlice({
+	name: 'flag',
+	initialState: false,
+	reducers: {
+		set: (state, action: PayloadAction<boolean>) => action.payload,
+	},
 });
 
-const App = () => {
-	const [state, setState] = useState(false);
-	const contextValue = useMemo(() => ({state, setState}), [state]);
-	return <Context.Provider value={contextValue}>
-		<Panel />
-		<ButtonGhost />
-	</Context.Provider>;
+const store = configureStore({reducer: stateSlice.reducer});
+
+const exStore = {
+	...store,
+	useStorePath: getUseStorePath(store),
 };
 
+const Context = createContext(exStore);
+
+const App = () => <Context.Provider value={exStore}>
+	<Panel />
+	<ButtonGhost />
+</Context.Provider>;
+
 const Panel = () => {
-	const {state, setState} = useContext(Context);
+	const {useStorePath, dispatch} = useContext(Context);
+	const flag = useStorePath([]);
 	return (
 		<div className='App'>
 			<button onClick={() => {
-				setState(!state);
-			}} >{state ? 'disable' : 'enable'}</button>
-			<span>{state ? 'enabled' : 'disabled'}</span>
+				dispatch(stateSlice.actions.set(!flag));
+			}} >{flag ? 'disable' : 'enable'}</button>
+			<span>{flag ? 'enabled' : 'disabled'}</span>
 		</div>
 	);
 };
 
 const ButtonGhost = () => {
-	const {state, setState} = useContext(Context);
+	const {useStorePath, dispatch} = useContext(Context);
+	const flag = useStorePath([]);
 	useEffect(() => {
-		if (state) {
+		if (flag) {
 			const id = setTimeout(() => {
-				setState(false);
+				dispatch(stateSlice.actions.set(false));
 			}, 1000);
 			return () => {
 				clearTimeout(id);
 			};
 		}
-	}, [state, setState]);
+	}, [flag, dispatch]);
 	return null;
 };
 

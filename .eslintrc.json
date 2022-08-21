@@ -26,5 +26,6 @@
         "react"
     ],
     "rules": {
+        "@typescript-eslint/default-param-last": 0
     }
 }

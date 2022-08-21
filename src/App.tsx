@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useMemo, useState} from 'react';
+import React, {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import './App.css';
 
 type ContextInterface = {
@@ -16,6 +16,7 @@ const App = () => {
 	const contextValue = useMemo(() => ({state, setState}), [state]);
 	return <Context.Provider value={contextValue}>
 		<Panel />
+		<ButtonGhost />
 	</Context.Provider>;
 };
 
@@ -29,6 +30,21 @@ const Panel = () => {
 			<span>{state ? 'enabled' : 'disabled'}</span>
 		</div>
 	);
+};
+
+const ButtonGhost = () => {
+	const {state, setState} = useContext(Context);
+	useEffect(() => {
+		if (state) {
+			const id = setTimeout(() => {
+				setState(false);
+			}, 1000);
+			return () => {
+				clearTimeout(id);
+			};
+		}
+	}, [state, setState]);
+	return null;
 };
 
 export default App;

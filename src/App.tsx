@@ -1,10 +1,11 @@
 import React, {createContext, useCallback, useContext, useEffect} from 'react';
-import {createSlice, configureStore} from '@reduxjs/toolkit';
+import {createSlice, configureStore, AnyAction} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {reducer as dynamicReducer} from '@simprl/dynamic-reducer';
 import {getUseStorePath} from 'use-store-path';
 import './App.css';
 import {Reducer} from 'redux';
+import {useConstHandler} from 'use-constant-handler';
 
 export const stateSlice = createSlice({
 	name: 'flag',
@@ -23,10 +24,15 @@ const useReducer = (name: string, reducer: Reducer) => {
 	);
 };
 
+const useSpaceAction = (space: string, actionCreator: () => AnyAction) => useConstHandler(() => {
+	store.dispatch({space, ...actionCreator()});
+});
+
 const exStore = {
 	...store,
 	useStorePath: getUseStorePath(store),
 	useReducer,
+	useSpaceAction,
 };
 
 const Context = createContext(exStore);
@@ -43,12 +49,10 @@ type WithSpace = {
 };
 
 const Panel = ({space}: WithSpace) => {
-	const {useStorePath, dispatch} = useContext(Context);
+	const {useStorePath, useSpaceAction} = useContext(Context);
 	const flag = useStorePath([space]);
 
-	const clickHandler = useCallback(() => {
-		dispatch({...stateSlice.actions.set(!flag), space});
-	}, [space, flag]);
+	const clickHandler = useSpaceAction(space, () => stateSlice.actions.set(!flag));
 
 	return (
 		<div className='App'>

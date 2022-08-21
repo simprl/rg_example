@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect} from 'react';
+import React, {createContext, useCallback, useContext, useEffect} from 'react';
 import {createSlice, configureStore} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {reducer as dynamicReducer} from '@simprl/dynamic-reducer';
@@ -45,11 +45,14 @@ type WithSpace = {
 const Panel = ({space}: WithSpace) => {
 	const {useStorePath, dispatch} = useContext(Context);
 	const flag = useStorePath([space]);
+
+	const clickHandler = useCallback(() => {
+		dispatch({...stateSlice.actions.set(!flag), space});
+	}, [space, flag]);
+
 	return (
 		<div className='App'>
-			<button onClick={() => {
-				dispatch({...stateSlice.actions.set(!flag), space});
-			}} >{flag ? 'disable' : 'enable'}</button>
+			<button onClick={clickHandler} >{flag ? 'disable' : 'enable'}</button>
 			<span>{flag ? 'enabled' : 'disabled'}</span>
 		</div>
 	);

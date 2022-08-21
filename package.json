@@ -14,6 +14,7 @@
     "@types/react-dom": "^18.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-ghost": "^1.0.1",
     "react-scripts": "5.0.1",
     "redux": "^4.2.0",
     "use-constant-handler": "^0.1.9",

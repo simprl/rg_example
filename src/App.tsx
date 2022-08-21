@@ -6,6 +6,7 @@ import {getUseStorePath} from 'use-store-path';
 import './App.css';
 import {Reducer} from 'redux';
 import {useConstHandler} from 'use-constant-handler';
+import {ghost, ghosts} from 'react-ghost';
 
 export const stateSlice = createSlice({
 	name: 'flag',
@@ -90,11 +91,11 @@ const AppUi = () => {
 
 const AppGhost = () => {
 	const {useStorePath} = useContext(Context);
-	const flag1 = useStorePath(['flag1']);
-	return <>
-		<ButtonGhost space='flag1' />
-		{flag1 && <ButtonGhost space='flag2' />}
-	</>;
+	const flag1 = useStorePath<string>(['flag1']);
+	return ghosts(
+		ghost(ButtonGhost, {space: 'flag1'}),
+		flag1 && ghost(ButtonGhost, {space: 'flag2'}),
+	);
 };
 
 export default App;

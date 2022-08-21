@@ -32,31 +32,37 @@ const exStore = {
 const Context = createContext(exStore);
 
 const App = () => <Context.Provider value={exStore}>
-	<Panel />
-	<ButtonGhost />
+	<Panel space='flag1' />
+	<Panel space='flag2' />
+	<ButtonGhost space='flag1' />
+	<ButtonGhost space='flag2' />
 </Context.Provider>;
 
-const Panel = () => {
+type WithSpace = {
+	space: string;
+};
+
+const Panel = ({space}: WithSpace) => {
 	const {useStorePath, dispatch} = useContext(Context);
-	const flag = useStorePath(['flag1']);
+	const flag = useStorePath([space]);
 	return (
 		<div className='App'>
 			<button onClick={() => {
-				dispatch({...stateSlice.actions.set(!flag), space: 'flag1'});
+				dispatch({...stateSlice.actions.set(!flag), space});
 			}} >{flag ? 'disable' : 'enable'}</button>
 			<span>{flag ? 'enabled' : 'disabled'}</span>
 		</div>
 	);
 };
 
-const ButtonGhost = () => {
-	useReducer('flag1', stateSlice.reducer);
+const ButtonGhost = ({space}: WithSpace) => {
+	useReducer(space, stateSlice.reducer);
 	const {useStorePath, dispatch} = useContext(Context);
-	const flag = useStorePath(['flag1']);
+	const flag = useStorePath([space]);
 	useEffect(() => {
 		if (flag) {
 			const id = setTimeout(() => {
-				dispatch({...stateSlice.actions.set(false), space: 'flag1'});
+				dispatch({...stateSlice.actions.set(false), space});
 			}, 1000);
 			return () => {
 				clearTimeout(id);

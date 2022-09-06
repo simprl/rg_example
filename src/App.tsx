@@ -91,7 +91,7 @@ const AppUi = () => {
 
 const AppGhost = () => {
 	const {useStorePath} = useContext(Context);
-	const flag1 = useStorePath<string>(['flag1']);
+	const flag1 = useStorePath<boolean>(['flag1']);
 	return ghosts(
 		ghost(ButtonGhost, {space: 'flag1'}),
 		flag1 && ghost(ButtonGhost, {space: 'flag2'}),
